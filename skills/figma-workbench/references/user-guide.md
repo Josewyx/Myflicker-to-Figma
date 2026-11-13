@@ -16,7 +16,7 @@
 | 用户关心的问题 | 读取章节 | 技术操作时补充 |
 | --- | --- | --- |
 | 安装、升级、第一次连接、暂停、多个文件、三种模式、版本兼容 | `help-connection` | `official-services` |
-| 创建界面、修改选中图层、组件/变量/字体、图像素材、导出、设计转代码 | `help-design` | `workflow`、`plugin-api`、`components-variables`、`assets-scenes`、`design-to-code` |
+| 创建界面、修改选中图层、组件/变量/字体、图像素材、设计转代码 | `help-design` | `workflow`、`plugin-api`、`components-variables`、`assets-scenes`、`design-to-code` |
 | 原型、关键帧、文字动画、自定义动画、FigJam、Slides、视频限制 | `help-motion` | `motion`、`text-motion`、`custom-animation-styles`、`figjam-slides` |
 | 无法连接、工具不见、版本旧、报错、超时、字体、功能只读 | `help-troubleshooting` | 与错误对应的技术章节 |
 
@@ -41,7 +41,6 @@
 | 局部修改 | 只把选中按钮的圆角改为 12 px，保留文案、变量绑定和组件关系。 |
 | 使用设计系统 | 优先复用本文件已有组件和颜色变量，不要重复新建。 |
 | 图片/矢量 | 把工作区中的 logo.svg 导入为可编辑矢量。 |
-| 导出 | 把选中画板导出为 PNG，告诉我保存路径。 |
 | 设计转代码 | 根据选中画板，在当前工作区实现页面，并复用项目已有组件。 |
 | 动效 | 先检查当前文件能否编辑关键帧，再让选中方块向右移动。 |
 | 排查 | 刚才操作超时了，请先检查画布，避免重复创建。 |

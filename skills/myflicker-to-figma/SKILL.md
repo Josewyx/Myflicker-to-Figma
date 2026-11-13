@@ -13,13 +13,17 @@ In a new conversation, silently call `figma_connect` with `waitSeconds:0`; when 
 
 One document binds on first use. Multiple documents and reconnects require `figma_select_document` with a connectionId from status. Names alone do not prove file identity. Bindings are scoped to an MCP connection; use fileKey on scripts to verify the destination. Files are read/written within the MCP launch workspace (`MF_FIGMA_WORKSPACE` can set it explicitly).
 
+## Delivery boundary
+
+Finish creation/editing with affected node IDs and bounded structural/keyframe readback, followed by a brief text response. Playback preview and all design/video/GIF/asset exports are performed manually by the user in Figma. Do not call export_animation, download_assets, node.exportAsync or figma.io.write for automatic delivery or verification; do not render videos or sample frames. Only an explicit user request for an Agent-generated export can opt into those retained tools.
+
 ## Read and edit
 
 Read `figma_read_guide({topic:"plugin-api"})` before scripting. For design systems also read `components-variables`. Other focused topics: `workflow`, `design-to-code`, `figjam-slides`, `assets-scenes`.
 
 Use shallow `get_metadata` to discover unknown targets; otherwise read the required nodes/properties directly. Respect truncation. Call `create_session` with fileKey from status and a task description. Pass its sessionId, fileKey and description on `use_figma`. Reuse that task for follow-ups. The field is exactly `description`, without a leading underscore; do not send `_description`, `_displayName` or `_intent` from another server’s schema. Read focused guides once per task and reuse their content; workflow is optional when the required execution contract is already known.
 
-Scripts have top-level await/return and native Figma API/helpers. Scripts keep the editor current page. For a known target, pass its page ID as use_figma.pageId; it is validated/selected before the script runs. Do not switch again after pageId already changed the page. Otherwise switch at most once explicitly. Ordinary scripts do not preload component instances; explicitly await getMainComponentAsync() only for instances used in mainComponent selectors. Local calls on a document are serialized. Preserve existing instances/variables, load exact fonts before text changes, return affected IDs, and verify visual changes using a real screenshot when requested or appropriate. If the user requests no screenshots or image feedback, skip screenshot calls, inline node.screenshot(), exports and image attachments; confirm affected IDs and bounded structural/motion readback, then respond briefly in text. Do not describe this as visual/playback verification. `get_screenshot` returns an image attachment plus a saved PNG path; if your client hides attachments, open the returned file. Metadata alone is not visual verification. `instance.getMainComponentAsync()` is supported; the synchronous getter is not.
+Scripts have top-level await/return and native Figma API/helpers. Scripts keep the editor current page. For a known target, pass its page ID as use_figma.pageId; it is validated/selected before the script runs. Do not switch again after pageId already changed the page. Otherwise switch at most once explicitly. Ordinary scripts do not preload component instances; explicitly await getMainComponentAsync() only for instances used in mainComponent selectors. Local calls on a document are serialized. Preserve existing instances/variables, load exact fonts before text changes, return affected IDs, and take a real screenshot only when explicitly requested. If the user requests no screenshots or image feedback, skip screenshot calls, inline node.screenshot(), exports and image attachments; confirm affected IDs and bounded structural/motion readback, then respond briefly in text. Do not describe this as visual/playback verification. `get_screenshot` returns an image attachment plus a saved PNG path; if your client hides attachments, open the returned file. Metadata alone is not visual verification. `instance.getMainComponentAsync()` is supported; the synchronous getter is not.
 
 ## Motion
 
@@ -27,9 +31,7 @@ Read `motion` before keyframes/timelines, `text-motion` for character/word revea
 
 The calling Agent is assumed to have **no Computer Use**. Do not open menus, click Play, or require screenshots of the desktop to create or verify motion. The user starts the paired companion once per target file; subsequent Agent work uses tools only.
 
-For actual animation verification, call `export_animation` on the containing top-level frame, with fileKey and task sessionId. It uses native `node.exportAsync` and saves real MP4/GIF/WebM bytes in the workspace. Start at width 640, 12 fps and LOW quality, then sample distinct timestamps locally (for example with ffmpeg) and inspect those images. A static `get_screenshot` is only a resting-state check. If native export is unavailable for this account/editor, report that limitation and stop export; do not switch to Computer Use or synthesize a look-alike animation. No in-editor Play/Pause tool is offered because the public Motion API has no documented playback-control method.
-
-There is no cloud `export_video`, Weave, cloud generation, or official Code Connect publishing in this local server. Native export availability is separate from those official MCP services.
+After writing motion, read back the affected tracks and timeline duration, then finish in text. Ask the user to preview playback in the Figma timeline/player; do not claim structural readback proves playback. Export is a manual user step, not part of creation or acceptance. No in-editor Play/Pause tool is offered.
 
 ## Recover
 

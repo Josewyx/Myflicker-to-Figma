@@ -1,6 +1,6 @@
 # Myflicker-to-Figma 使用指南
 
-> 版本 0.5.7｜更新 2026-11-13｜macOS 本地使用
+> 版本 0.5.8｜更新 2026-11-13｜macOS 本地使用
 
 Myflicker-to-Figma 让 MyFlicker 用自然语言读取、创建和编辑 Figma 原生设计。免费 Starter 账号在具有文件编辑权限时也可使用；支持当前账号和编辑器实际开放的原生动效，生成的图层可继续编辑。
 
@@ -65,7 +65,7 @@ Josewyx/Myflicker-to-Figma
 
 回到当前本地 Code 会话，发送：
 
-> 使用 Myflicker-to-Figma，在当前文件中新建一个 960×540 的可编辑画板，主题为「Hello Motion」，保留已有设计。先检测原生 Motion 能力；可用时让标题逐字入场、圆形轻轻位移并淡入，制作约 3 秒的动效。本次不要截图、导出视频或回传图片；完成后仅用文字简短说明。
+> 使用 Myflicker-to-Figma，在当前文件中新建一个 960×540 的可编辑画板，主题为「Hello Motion」，保留已有设计。先检测原生 Motion 能力；可用时让标题逐字入场、圆形轻轻位移并淡入，制作约 3 秒的动效。完成后回读图层与关键帧，仅用文字简短说明；不要截图、导出任何文件或回传图片。预览与导出由我在 Figma 中手动完成。
 
 这条体验指令**不截图、不导出视频、不回传图片**，完成后仅用文字简短说明。你可以在 Figma 直接查看新画板；动效播放需在编辑器中自行预览。结构或关键帧回读不等同于播放验收。
 
@@ -75,7 +75,7 @@ Figma 配套插件仍在运行时，直接向 MyFlicker 的本地 Code 会话描
 
 ## 6. 升级与旧入口清理
 
-**0.5.7 修复了多页面创建与全页组件预加载问题。更新 MyFlicker 端后，请关闭并重新运行 Figma 插件，确认向导两端都显示 0.5.7；旧配套协议会拒绝写入并提示更新。当前会话仍使用旧工具时，新建本地 Code 会话。**
+**0.5.8 修复了多页面创建与全页组件预加载问题。更新 MyFlicker 端后，请关闭并重新运行 Figma 插件，确认向导两端都显示 0.5.8；旧配套协议会拒绝写入并提示更新。当前会话仍使用旧工具时，新建本地 Code 会话。**
 
 
 **MyFlicker：** 在“管理 Marketplace”点击本市场右侧刷新图标，再回插件列表更新或安装新版。不是运行中的无感热更新；先等当前操作完成，避免新旧版本同时启用。工具未刷新时重启 MyFlicker 并新建会话。
@@ -102,7 +102,7 @@ Figma 配套插件仍在运行时，直接向 MyFlicker 的本地 Code 会话描
 
 ## 备用：ZIP 本地安装
 
-从 [GitHub Releases](https://github.com/Josewyx/Myflicker-to-Figma/releases/latest) 下载 `Myflicker-to-Figma-0.5.7.zip`。解压后，在 MyFlicker **设置 → Plugins → 安装本地 Plugin** 选择整个 **Myflicker-to-Figma-0.5.7** 文件夹；不要选择其中的 .claude-plugin、skills 或 Figma manifest。然后从本指南第 2 步继续。
+从 [GitHub Releases](https://github.com/Josewyx/Myflicker-to-Figma/releases/latest) 下载 `Myflicker-to-Figma-0.5.8.zip`。解压后，在 MyFlicker **设置 → Plugins → 安装本地 Plugin** 选择整个 **Myflicker-to-Figma-0.5.8** 文件夹；不要选择其中的 .claude-plugin、skills 或 Figma manifest。然后从本指南第 2 步继续。
 
 ## 隐私与能力边界
 
@@ -111,3 +111,7 @@ Figma 配套插件仍在运行时，直接向 MyFlicker 的本地 Code 会话描
 插件不消耗官方远程 MCP 调用额度；MyFlicker 模型费用与数据处理按客户端及模型服务规则执行。本地桥接不代表整个 AI 流程完全离线。账号未开放的能力不会因安装本插件而获得。
 
 配图为不含个人数据的通用操作示意，实际界面可能随应用更新变化。
+
+## 交付方式
+
+创建和修改完成后，Agent 回读相关图层、关键帧并简短文字说明，任务即结束。播放预览、视频/GIF/图片等文件导出均由用户在 Figma 中手动完成，不作为 Agent 的验收步骤。

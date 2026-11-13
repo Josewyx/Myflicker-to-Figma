@@ -7,8 +7,8 @@
     {
       "name": "myflicker-to-figma",
       "source": "./",
-      "description": "让 MyFlicker 用自然语言读写和编辑 Figma 原生设计。免费 Figma 账号也支持，具备文件编辑权限即可使用；支持原生动效与视频导出，具体能力以当前账号和编辑器为准。生成结果可继续编辑，不消耗官方远程 MCP 调用额度。",
-      "version": "0.5.7"
+      "description": "让 MyFlicker 用自然语言读写和编辑 Figma 原生设计。免费 Figma 账号也支持，具备文件编辑权限即可使用；支持原生动效，具体能力以当前账号和编辑器为准。生成结果可继续编辑，不消耗官方远程 MCP 调用额度。",
+      "version": "0.5.8"
     }
   ]
 }
