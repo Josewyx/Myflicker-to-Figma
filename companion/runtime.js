@@ -77,18 +77,12 @@
       // enumerable fields, losing application IDs during {...style} edits.
       const isNode = value => value && typeof value.id === 'string' && typeof value.type === 'string' && typeof value.getPluginData === 'function' && !['FIGMA','CUSTOM','CUSTOM_ANIMATION'].includes(value.type)
       const progress = () => { try { runtime.onProgress([...placeholders.values()].map(n=>({id:n.id,name:n.name}))) } catch {} }
-      // Dynamic-page Figma forbids the synchronous instance.mainComponent getter.
-      // Prime the synchronous query helper from the public async API, scoped to loaded targets.
-      async function hydrate(target) {
-        if (!isNode(target) || target.type==='DOCUMENT') return
-        const instances = [target, ...(target.findAll && target.findAllWithCriteria ? target.findAllWithCriteria({types:['INSTANCE']}) : [])].filter(node=>node.type==='INSTANCE')
-        for (const instance of instances) if (typeof instance.getMainComponentAsync === 'function') components.set(instance, await instance.getMainComponentAsync())
-      }
+      // Resolve a main component only when the script explicitly requests it.
+      // Ordinary reads/creation must not scan or depend on unrelated instances.
       const mainComponent = node => {
         if (components.has(node)) return components.get(node)
-        try { return node.mainComponent } catch { throw new Error('Call await instance.getMainComponentAsync() or await page.loadAsync() before querying mainComponent') }
+        try { return node.mainComponent } catch { throw new Error('Before a mainComponent selector, explicitly await getMainComponentAsync() on the relevant instances in this call. No whole-page component preload is performed.') }
       }
-      await hydrate(figma.currentPage)
       const unwrap = value => raws.get(value) || (Array.isArray(value) ? value.map(unwrap) : value)
       const set = (node, props) => {
         if (!props || typeof props !== 'object' || Array.isArray(props)) throw new Error('set expects a property object')
@@ -161,7 +155,7 @@
             if (target === figma && key === 'io') return io
             if (target === figma && key === 'setCurrentPageAsync') return async page => {
               if(runtime.pageSwitches>=1)throw new Error('Switch pages at most once per use_figma call')
-              runtime.pageSwitches++;const raw=unwrap(page);await figma.setCurrentPageAsync(raw);await hydrate(raw)
+              runtime.pageSwitches++;const raw=unwrap(page);await figma.setCurrentPageAsync(raw)
             }
             if (target === figma && key === 'createAutoLayout') return (direction = 'HORIZONTAL', props = {}) => {
               if (typeof direction === 'object') { props = direction; direction = 'HORIZONTAL' }
@@ -174,7 +168,7 @@
             const v = target[key]
             return typeof v === 'function' ? (...args) => {
               const out=v.apply(target,args.map(unwrap))
-              if(out&&typeof out.then==='function')return out.then(async resolved=>{if(key==='getMainComponentAsync')components.set(target,resolved);await hydrate(key==='loadAsync'?target:resolved);return wrap(resolved)})
+              if(out&&typeof out.then==='function')return out.then(async resolved=>{if(key==='getMainComponentAsync')components.set(target,resolved);return wrap(resolved)})
               if(key==='createInstance'&&target.type==='COMPONENT')components.set(out,target)
               if(key==='swapComponent')components.set(target,unwrap(args[0]))
               if(key==='setProperties')components.delete(target)
@@ -277,8 +271,12 @@
         case 'use_figma': {
           if (typeof args.code !== 'string' || !args.code.trim() || args.code.length > 150000) throw new Error('Provide a script of 1–150000 characters')
           const run = new Function('figma', 'dsh', '"use strict"; return (async () => {\n' + args.code + '\n})()')
-          const first=f.root.children[0]
-          if(first&&f.currentPage!==first)await f.setCurrentPageAsync(first)
+          if(args.pageId!==undefined){
+            if(typeof args.pageId!=='string'||!args.pageId)throw new Error('pageId must identify an existing page')
+            const page=await f.getNodeByIdAsync(args.pageId)
+            if(!page||page.type!=='PAGE')throw new Error('pageId must identify an existing page; no script ran')
+            if(page!==f.currentPage){await f.setCurrentPageAsync(page);this.pageSwitches++}
+          }
           assets=[]
           const facade=await this.facade(images,assets)
           this.scriptEntered=true

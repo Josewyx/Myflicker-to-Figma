@@ -36,7 +36,7 @@ test('wizard checks connection without credentials and reveal is local, nonce-pr
  assert.equal((await fetch(base+'/setup/images/01-install.png',{headers:{origin:'https://evil.example'}})).status,403)
  assert.equal((await post({nonce:state.actionNonce,path:'/arbitrary/path'})).status,200)
  assert.deepEqual(reveals,[[hub.companion.manifest,{reveal:true}]])
- await connect(hub,'<img src=x onerror=alert(1)>',4)
+ await connect(hub,'<img src=x onerror=alert(1)>',5)
  state=await (await fetch(base+'/setup/status')).json();assert.equal(state.connected,true);assert.equal(state.documentCount,1)
  assert.equal(state.documentNames[0],'<img src=x onerror=alert(1)>')
  assert.equal([...hub.documents.values()][0].queue.length,0)
@@ -45,8 +45,11 @@ test('connect waits for the user and client expiry recovers status without repla
  const {hub,config,workspace}=await fixture(t),client=await new HubClient(config).connect(workspace)
  t.after(()=>client.close())
  assert.equal((await client.call('figma_connect')).structuredContent.state,'needs_user_action')
- const waiting=client.call('figma_connect',{waitSeconds:2}),id=await connect(hub,'Example',4)
- assert.equal((await waiting).structuredContent.connected,true)
+ const waiting=client.call('figma_connect',{waitSeconds:2}),id=await connect(hub,'Example',5)
+ const ready=(await waiting).structuredContent
+ assert.equal(ready.connected,true);assert.equal(ready.setupUrl,null);assert.equal(ready.showSetupWizard,false);assert.equal(ready.requiresConnectionAction,false)
+ const reused=(await client.call('figma_connect')).structuredContent
+ assert.equal(reused.connected,true);assert.equal(reused.setupUrl,null);assert.equal(reused.requiresConnectionAction,false)
  // A service upgrade/expired transport has lost its task state, not the user's canvas.
  hub.clients.delete(client.id)
  const recovered=await client.call('figma_status',{compact:true})
@@ -60,7 +63,7 @@ test('connect waits for the user and client expiry recovers status without repla
  assert.equal(client.id,null);assert.equal(hub.documents.get(id).queue.length,0)
 })
 test('busy work prevents automatic service replacement',async t=>{
- const {hub,config}=await fixture(t),id=await connect(hub,'Busy',4)
+ const {hub,config}=await fixture(t),id=await connect(hub,'Busy',5)
  hub.documents.get(id).active={id:'pending-operation',settled:true}
  const res=await request(hub,'/mf/shutdown',{})
  assert.equal(res.status,409);assert.equal((await res.json()).code,'BRIDGE_BUSY');assert.equal(hub.stopped,false)

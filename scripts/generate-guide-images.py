@@ -5,7 +5,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 import html
 root=Path(__file__).resolve().parents[1]
-steps=[('01-install','在 MyFlicker 安装','设置 → Plugins','安装本地 Plugin','选择整个公开插件文件夹'),('02-import-menu','在 Figma 首次导入','打开一个设计文件','Plugins → Development','Import plugin from manifest…'),('03-select-manifest','选择本机配套文件','文件窗口左侧 → 下载','Myflicker-to-Figma（本机专用）','选中 manifest.json → 打开'),('04-connected','连接成功后开始使用','运行 Myflicker-to-Figma','确认绿色“已连接”状态','可以收起窗口；关闭会断开连接')]
+steps=[('01-install','从 GitHub 市场安装','设置 → Plugins → 插件市场','添加 Josewyx/Myflicker-to-Figma','找到插件 → 安装并启用'),('02-import-menu','在 Figma 首次导入','打开一个设计文件','Plugins → Development','Import plugin from manifest…'),('03-select-manifest','选择本机配套文件','文件窗口左侧 → 下载','Myflicker-to-Figma（本机专用）','选中 manifest.json → 打开'),('04-connected','连接成功后开始使用','运行 Myflicker-to-Figma','确认绿色“已连接”状态','可以收起窗口；关闭会断开连接')]
 with sync_playwright() as p:
  browser=p.chromium.launch(headless=True)
  page=browser.new_page(viewport={'width':1100,'height':520},device_scale_factor=1)

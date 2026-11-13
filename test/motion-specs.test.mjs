@@ -167,7 +167,7 @@ test('bridge refreshes only the selected document capability snapshot and does n
   assert.equal(bridge.list().find(d=>d.connectionId===id).needsInspection,true)
   assert.equal(bridge.list().find(d=>d.connectionId===other).capabilities.features.textAnimation.state,'unknown')
   assert.equal(requiredQueryFeatureVersion('get_capabilities'),4);assert.equal(requiredQueryFeatureVersion('get_motion_context'),4)
-  assert.equal(requiredQueryFeatureVersion('use_figma'),3)
+  assert.equal(requiredQueryFeatureVersion('use_figma'),5)
 })
 
 test('capability transport strips unexpected fields and never accepts write-verification claims',()=>{

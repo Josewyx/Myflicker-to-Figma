@@ -51,6 +51,7 @@ export class MfHub extends LocalBridge{
   }
   async execute(client,name,args,signal){
     let dispatched=false
+    const timing={}
     try{
       const tool=validateCall(name,args)
       if(name==='figma_status')return textResult(this.status(client,args))
@@ -59,7 +60,7 @@ export class MfHub extends LocalBridge{
         const deadline=Date.now()+1000*(args.waitSeconds??0)
         while(!this.list().length&&Date.now()<deadline){signal?.throwIfAborted();await new Promise(r=>setTimeout(r,250))}
         const status=this.status(client,{compact:true}),connected=status.documents.length>0
-        return textResult({connected,state:connected?'connected':'needs_user_action',setupUrl:status.setupUrl,documents:status.documents,documentBinding:status.documentBinding,connectionHealth:status.connectionHealth,nextAction:connected?(status.documentBinding.requiresSelection?'Use figma_select_document to confirm the intended document.':'Continue through local tools; never close the companion window.'):'请打开连接向导，首次导入后在目标 Figma 文件运行 Myflicker-to-Figma。此步骤由用户完成，Agent 不需要 Computer Use。'})
+        return textResult({connected,state:connected?'connected':'needs_user_action',setupUrl:connected?null:status.setupUrl,showSetupWizard:!connected,requiresConnectionAction:!connected,documents:status.documents,documentBinding:status.documentBinding,connectionHealth:status.connectionHealth,nextAction:connected?(status.documentBinding.requiresSelection?'Use figma_select_document to confirm the intended document.':'Connection is ready. Continue the user task immediately through local tools; do not ask the user to connect again or open setup. Reuse the current task session when available; never close the companion window.'):'请打开连接向导，首次导入后在目标 Figma 文件运行 Myflicker-to-Figma。此步骤由用户完成，Agent 不需要 Computer Use。'})
       }
       if(name==='figma_read_guide')return await readGuide(args.topic)
       if(name==='figma_select_document'){
@@ -84,7 +85,7 @@ export class MfHub extends LocalBridge{
         }
         signal?.throwIfAborted()
         dispatched=true
-        const response=await this.call(doc.connectionId,wireName,payload,{signal,mutation:tool.mutation,inspect:tool.inspect&&!requiresQueryFeatures(name,args)})
+        const response=await this.call(doc.connectionId,wireName,payload,{signal,mutation:tool.mutation,inspect:tool.inspect&&!requiresQueryFeatures(name,args),onMetric:metric=>{for(const key of ['queueMs','bridgeMs'])if(Number.isFinite(metric[key]))timing[key]=Math.round(metric[key]*100)/100}})
         if(name==='export_animation'){
           validateAnimationAsset(response.assets,animationSettings(args).format)
           response.value={...response.value,files:await saveAssets(client.workspace,response.assets)}
@@ -93,6 +94,10 @@ export class MfHub extends LocalBridge{
         const files=name==='use_figma'&&response.assets?.length?await saveAssets(client.workspace,response.assets):[]
         if(name==='get_screenshot'&&(!Array.isArray(response.images)||response.images.length!==1))throw Object.assign(new Error('Screenshot response contained no single image. No visual verification was completed; retry get_screenshot or inspect the companion/client connection.'),{code:'SCREENSHOT_MISSING',safeToRetryWithoutCanvasRead:true})
         const out=localResult(response)
+        const performance={...timing}
+        for(const key of ['runtimeMs','exportMs','serializationMs','nodeCount','imageCount','valueBytes'])if(Number.isFinite(response.metrics?.[key])&&response.metrics[key]>=0)performance[key]=Math.round(response.metrics[key]*100)/100
+        out.structuredContent.performance=performance
+        out.content.push({type:'text',text:JSON.stringify({performance})})
         if(name==='get_screenshot'){
           const screenshots=await saveAssets(client.workspace,response.images.map(image=>({...image,name:'screenshot-'+String(args.nodeId??'node').replace(/[^a-zA-Z0-9_-]/g,'-')+'.png'})))
           out.structuredContent.files=screenshots
@@ -104,6 +109,7 @@ export class MfHub extends LocalBridge{
       }finally{client.pending--}
     }catch(error){
       const value={error:String(error.message??error),safeToRetryWithoutCanvasRead:!dispatched||error.safeToRetryWithoutCanvasRead===true}
+      if(Object.keys(timing).length)value.performance={...timing}
       if(error.code){value.code=error.code;value.setupUrl=this.status().setupUrl}
       if(error instanceof ScriptPreflightError)value.diagnostic={stage:'preflight',...error.diagnostic}
       return {...textResult(value),isError:true}

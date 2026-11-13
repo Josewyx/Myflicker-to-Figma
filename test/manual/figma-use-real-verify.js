@@ -1,3 +1,4 @@
+// Historical upstream first-page contract sample; retained for preflight parsing, not the current local runtime page behavior.
 const startedOn=figma.currentPage.id;
 const page=await figma.getNodeByIdAsync('30:50');await figma.setCurrentPageAsync(page);
 const collection=await figma.variables.getVariableCollectionByIdAsync('VariableCollectionId:30:51');

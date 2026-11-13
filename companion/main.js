@@ -10,7 +10,7 @@ figma.ui.onmessage = async message => {
   if (message.type === 'describe') {
     let capabilities
     try { capabilities = await globalThis.DshFigmaCapabilities.probe(figma) } catch {} // Discovery must not prevent pairing.
-    figma.ui.postMessage({ type: 'document', name: figma.root.name, editorType: figma.editorType, fileKey: figma.fileKey || null, featureVersion: 4, capabilities, companionVersion: globalThis.DSH_FIGMA_BOOTSTRAP?.version || null, connection: globalThis.DSH_FIGMA_BOOTSTRAP || null })
+    figma.ui.postMessage({ type: 'document', name: figma.root.name, editorType: figma.editorType, fileKey: figma.fileKey || null, featureVersion: 5, capabilities, companionVersion: globalThis.DSH_FIGMA_BOOTSTRAP?.version || null, connection: globalThis.DSH_FIGMA_BOOTSTRAP || null })
     return
   }
   if (message.type !== 'execute') return

@@ -62,7 +62,7 @@ test('instance filters resolve public async main components without accessing fo
   component.name='Button';instance.type='INSTANCE';instance.getMainComponentAsync=async()=>component
   Object.defineProperty(instance,'mainComponent',{get(){throw Error('dynamic-page forbidden getter')}})
   f.page.appendChild(instance)
-  const {value}=await f.runtime.run('use_figma',{code:`return {byId:figma.currentPage.query('INSTANCE[mainComponent=${component.id}]').values(['id']),byName:figma.currentPage.query('INSTANCE[mainComponent.name=Button]').length}`})
+  const {value}=await f.runtime.run('use_figma',{code:`await (await figma.getNodeByIdAsync('${instance.id}')).getMainComponentAsync();return {byId:figma.currentPage.query('INSTANCE[mainComponent=${component.id}]').values(['id']),byName:figma.currentPage.query('INSTANCE[mainComponent.name=Button]').length}`})
   assert.deepEqual(plain(value.byId),[{id:instance.id}]);assert.equal(value.byName,1)
 })
 test('instance descendant IDs with semicolons are selectable without CSS escaping',async()=>{
@@ -70,11 +70,11 @@ test('instance descendant IDs with semicolons are selectable without CSS escapin
   const {value}=await f.runtime.run('use_figma',{code:"return {hash:figma.currentPage.query('#I30:61;30:58').values(['id']),bare:figma.currentPage.query('I30:61;30:58').first().id}"})
   assert.deepEqual(plain(value.hash),[{id:child.id}]);assert.equal(value.bare,child.id)
 })
-test('page reset happens each call; one async switch allowed and synchronous switching is rejected',async()=>{
+test('page context is retained each call; one explicit switch allowed and synchronous switching is rejected',async()=>{
   const f=await fixtureRuntime(),second=f.figma.createPage();f.figma.currentPage=second
-  assert.equal((await f.runtime.run('use_figma',{code:'return figma.currentPage.id'})).value,f.page.id)
+  assert.equal((await f.runtime.run('use_figma',{code:'return figma.currentPage.id'})).value,second.id)
   assert.equal((await f.runtime.run('use_figma',{code:`await figma.setCurrentPageAsync(await figma.getNodeByIdAsync('${second.id}'));return figma.currentPage.id`})).value,second.id)
-  assert.equal((await f.runtime.run('use_figma',{code:'return figma.currentPage.id'})).value,f.page.id)
+  assert.equal((await f.runtime.run('use_figma',{code:'return figma.currentPage.id'})).value,second.id)
   await assert.rejects(f.runtime.run('use_figma',{code:'figma.currentPage=figma.currentPage'}),/not supported/)
   await assert.rejects(f.runtime.run('use_figma',{code:'await figma.setCurrentPageAsync(figma.currentPage);await figma.setCurrentPageAsync(figma.currentPage)'}),/at most once/)
 })

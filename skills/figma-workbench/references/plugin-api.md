@@ -8,7 +8,7 @@ Start a task with `create_session({fileKey,description})`, using the exact fileK
 
 Write a plain asynchronous JavaScript body: top-level `await` and `return`; NO extra IIFE. Console output is not tool output. Return all affected node, variable, collection, style and component IDs plus relevant counts/names/bounds. IDs persist; JavaScript variables do not. Do not call closePlugin or replace the companion UI/message handler. Scripts have no host filesystem APIs.
 
-Every call starts on the FIRST page, including read-only calls. Re-select a known target with `await figma.setCurrentPageAsync(page)` at most once per call. The sync setter throws. `await page.loadAsync()` loads a non-active page for inspection. The local editor has one shared currentPage: keep calls sequential rather than copying the cloud parallel-page workflow.
+Calls preserve the editor current page. Pass use_figma.pageId to validate and select a known target page before running the script; an invalid page ID fails before creation. Do not spend another page switch after the parameter changed the page. Without pageId, explicitly await figma.setCurrentPageAsync(page) at most once when required. The sync setter throws. page.loadAsync() loads a page without resolving all its components. Main-component selectors require explicit getMainComponentAsync() reads on relevant instances in the same call; creation and ordinary reads do not scan the whole page. Keep calls sequential because the editor has one shared currentPage.
 
 ## Query and QueryResult
 

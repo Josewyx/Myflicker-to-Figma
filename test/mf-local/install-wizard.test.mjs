@@ -57,7 +57,7 @@ test('connection wizard guides import, switches to runtime and confirms actual c
  const $=id=>{if(!elements.has(id))elements.set(id,{hidden:false,disabled:false,textContent:'',dataset:{}});return elements.get(id)}
  let connected=false,reachable=true,compatible=true
  const document={body:{dataset:{}},getElementById:$}
- const state=()=>({version:'test',platform:'darwin',arch:'arm64',health:{state:compatible?'ready':'limited',compatible,filesReady:true,missingFiles:[],companions:connected?[{version:'test',featureVersion:4}]:[],message:'health'},manifest:'/private/manifest.json',actionNonce:'nonce',connected,documentCount:connected?1:0,documentNames:connected?['PRIVATE-FILE']:[]})
+ const state=()=>({version:'test',platform:'darwin',arch:'arm64',health:{state:compatible?'ready':'limited',compatible,filesReady:true,missingFiles:[],companions:connected?[{version:'test',featureVersion:5}]:[],message:'health'},manifest:'/private/manifest.json',actionNonce:'nonce',connected,documentCount:connected?1:0,documentNames:connected?['PRIVATE-FILE']:[]})
  const ctx=vm.createContext({document,navigator:{clipboard:{writeText:async text=>clipboard.push(text)}},fetch:async()=>({ok:reachable,json:async()=>state()}),setTimeout:()=>1,clearTimeout(){}})
  vm.runInContext(html.match(/<script>([\s\S]*?)<\/script>/)[1],ctx)
  for(let i=0;i<4;i++)await new Promise(r=>setImmediate(r))

@@ -1,6 +1,6 @@
 {
   "name": "myflicker-to-figma",
-  "version": "0.5.5",
+  "version": "0.5.7",
   "description": "让 MyFlicker 用自然语言读写和编辑 Figma 原生设计。免费 Figma 账号也支持，具备文件编辑权限即可使用；支持原生动效与视频导出，具体能力以当前账号和编辑器为准。生成结果可继续编辑，不消耗官方远程 MCP 调用额度。",
   "type": "module",
   "license": "MIT",
@@ -35,7 +35,7 @@
   "scripts": {
     "check": "node scripts/check-mf.mjs",
     "test": "node --test test/mf-local/*.test.mjs",
-    "test:upstream": "node --test test/bridge.test.mjs test/runtime.test.mjs test/runtime-queries.test.mjs test/motion-specs.test.mjs test/figma-use-contract.test.mjs test/script-preflight.test.mjs",
+    "test:upstream": "node --test test/bridge.test.mjs test/runtime.test.mjs test/runtime-queries.test.mjs test/motion-specs.test.mjs test/figma-use-contract.test.mjs test/script-preflight.test.mjs test/page-performance.test.mjs",
     "test:all": "npm run check && npm test && npm run test:upstream",
     "setup": "node mf/cli.mjs setup",
     "install:mf": "node mf/cli.mjs install-mf",

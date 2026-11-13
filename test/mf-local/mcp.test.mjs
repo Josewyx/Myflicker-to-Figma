@@ -24,7 +24,7 @@ test('standard MCP stdio client discovers and executes the MF tools without DSH 
   assert.ok(!listed.tools.some(x=>x.name==='export_video'))
   const status=await client.callTool({name:'figma_status',arguments:{}})
   assert.equal(status.structuredContent.backend,'local');assert.equal(status.structuredContent.officialMcpUsed,false)
-  const id=await connect(hub,'Test',4),runtime=await fixtureRuntime()
+  const id=await connect(hub,'Test',5),runtime=await fixtureRuntime()
   const task=await client.callTool({name:'create_session',arguments:{fileKey:`local:${id}`,description:'MCP test'}})
   const result=client.callTool({name:'use_figma',arguments:{fileKey:`local:${id}`,sessionId:task.structuredContent.sessionId,description:'MCP test',code:'return {page:figma.currentPage.id};'}})
   await runJob(hub,id,runtime.runtime)
