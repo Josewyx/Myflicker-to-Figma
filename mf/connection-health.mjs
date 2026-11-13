@@ -1,10 +1,10 @@
 import {lstat} from 'node:fs/promises'
 import {dirname,join} from 'node:path'
 
-const version=value=>typeof value==='string'&&/^\d+\.\d+\.\d+$/.test(value)?value:null
+const version=value=>typeof value==='string'&&/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(value)?value:null
 export function versionHealth(bridgeVersion,documents=[]){
   const companions=documents.map(d=>({version:version(d.companionVersion),featureVersion:Number.isInteger(d.featureVersion)?d.featureVersion:0}))
-  const compatible=companions.every(d=>d.featureVersion>=5)
+  const compatible=companions.every(d=>d.featureVersion>=8)
   const state=!companions.length?'waiting':!compatible?'limited':companions.some(d=>!d.version)?'unknown-version':companions.some(d=>d.version!==bridgeVersion)?'version-mismatch':'ready'
   const messages={waiting:'尚未收到 Figma 连接。先在目标文件运行插件；首次使用才需要导入。',limited:'Figma 配套插件较旧，部分工具不可用。请关闭它，再从 Development 菜单重新运行；仍提示较旧时，重新准备并导入配套文件。','unknown-version':'已连接，但无法确认 Figma 插件版本。建议关闭插件后重新运行，以确认两端版本。','version-mismatch':'两端版本不同，当前工具协议仍兼容。建议关闭 Figma 插件后重新运行；若 Figma 端仍比本地服务新，请更新 MyFlicker 端插件。',ready:'两端版本一致，可以继续操作。'}
   return {state,compatible,bridgeVersion,companions,message:messages[state]}

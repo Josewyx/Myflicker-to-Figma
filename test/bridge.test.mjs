@@ -39,8 +39,8 @@ test('queued cancellation never dispatches and active cancellation never replays
   const blocked=b.call(id,'use_figma',{code:'return 3'},{mutation:true})
   const poll=request(b,'/poll',{connectionId:id})
   await assert.rejects(blocked,/uncertain/)
-  const read=b.call(id,'get_metadata',{},{inspect:true}),readJob=await (await poll).json()
-  await request(b,'/result',{connectionId:id,id:readJob.id,ok:true,result:{value:{},images:[]}});await read
+  const read=b.call(id,'get_metadata',{nodeId:'1:1'},{inspect:true}),readJob=await (await poll).json()
+  await request(b,'/result',{connectionId:id,id:readJob.id,ok:true,result:{value:{id:"1:1",type:"FRAME",childCount:0,children:[]},images:[]}});await read
   assert.equal(b.list()[0].needsInspection,false)
 })
 test('partial error gates writes; metadata reconciles; duplicate result is rejected',async t=>{

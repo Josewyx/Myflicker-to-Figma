@@ -14,9 +14,18 @@ export async function hubRequest(config,token,path,data={},signal){
 export async function ensureHub(config=configuration()){
   const token=await bridgeToken(config.home)
   const newer=(a,b)=>{
-    if(!/^\d+\.\d+\.\d+$/.test(b))throw Object.assign(new Error('无法识别现有本地服务版本，保留该服务。'),{status:409,code:'INCOMPATIBLE_BRIDGE'})
-    const aa=a.split('.').map(Number),bb=b.split('.').map(Number)
-    for(let i=0;i<3;i++)if(aa[i]!==bb[i])return aa[i]>bb[i]
+    const parse=value=>/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?$/.exec(value)
+    const aa=parse(a),bb=parse(b)
+    if(!aa||!bb)throw Object.assign(new Error('无法识别现有本地服务版本，保留该服务。'),{status:409,code:'INCOMPATIBLE_BRIDGE'})
+    for(let i=1;i<=3;i++)if(Number(aa[i])!==Number(bb[i]))return Number(aa[i])>Number(bb[i])
+    if(!aa[4]||!bb[4])return !aa[4]&&!!bb[4]
+    const ap=aa[4].split('.'),bp=bb[4].split('.')
+    for(let i=0;i<Math.max(ap.length,bp.length);i++){
+      if(ap[i]===bp[i])continue
+      if(ap[i]===undefined||bp[i]===undefined)return bp[i]===undefined
+      const an=/^\d+$/.test(ap[i]),bn=/^\d+$/.test(bp[i])
+      return an&&bn?Number(ap[i])>Number(bp[i]):an!==bn?!an:ap[i]>bp[i]
+    }
     return false
   }
   const probe=async()=>{

@@ -45,7 +45,7 @@ test('paired companion is private, MF branded, and local endpoints reject unauth
 })
 
 test('real bridge/runtime roundtrip creates native nodes and returns MCP image blocks and files',async t=>{
-  const {hub,workspace,open,call}=await setup(t),client=await open(),id=await connect(hub,'Test',5)
+  const {hub,workspace,open,call}=await setup(t),client=await open(),id=await connect(hub,'Test',8)
   const f=await fixtureRuntime(),task=await taskFor(call,client,id)
   const pending=call(client,'use_figma',{...task,code:'const f=figma.createFrame(); f.name="MF test"; figma.currentPage.appendChild(f); return {id:f.id,name:f.name};'})
   await runJob(hub,id,f.runtime)
@@ -70,7 +70,7 @@ test('real bridge/runtime roundtrip creates native nodes and returns MCP image b
 
 test('sessions do not share targets or task UUIDs; reconnect never changes a binding implicitly',async t=>{
   const {hub,open,call}=await setup(t),a=await open(),b=await open()
-  const one=await connect(hub,'One',5),two=await connect(hub,'Two',5)
+  const one=await connect(hub,'One',8),two=await connect(hub,'Two',8)
   assert.equal((await call(a,'get_selection')).isError,true)
   await call(a,'figma_select_document',{connectionId:one});await call(b,'figma_select_document',{connectionId:two})
   const task=await taskFor(call,a,one)
@@ -79,7 +79,7 @@ test('sessions do not share targets or task UUIDs; reconnect never changes a bin
   const stolen=await call(b,'use_figma',{...task,fileKey:`local:${two}`,code:'return 1'})
   assert.equal(stolen.isError,true)
   await request(hub,'/disconnect',{connectionId:one})
-  await connect(hub,'One',5)
+  await connect(hub,'One',8)
   const disconnected=await call(a,'get_selection')
   assert.equal(disconnected.isError,true)
   assert.match(disconnected.structuredContent.error,/disconnected/)
@@ -87,7 +87,7 @@ test('sessions do not share targets or task UUIDs; reconnect never changes a bin
 })
 
 test('syntax and workspace errors fail before dispatch, with retry information intact',async t=>{
-  const {hub,home,open,call}=await setup(t),client=await open(),id=await connect(hub,'Test',5),task=await taskFor(call,client,id)
+  const {hub,home,open,call}=await setup(t),client=await open(),id=await connect(hub,'Test',8),task=await taskFor(call,client,id)
   const syntax=await call(client,'use_figma',{...task,code:'const broken = ;'})
   assert.equal(syntax.isError,true);assert.equal(syntax.structuredContent.safeToRetryWithoutCanvasRead,true)
   assert.equal(syntax.structuredContent.diagnostic.stage,'preflight')
@@ -100,7 +100,7 @@ test('syntax and workspace errors fail before dispatch, with retry information i
 })
 
 test('animation export uses native exportAsync and saves encoded output without editor automation',async t=>{
-  const {hub,open,call}=await setup(t),client=await open(),id=await connect(hub,'Native export test',5)
+  const {hub,open,call}=await setup(t),client=await open(),id=await connect(hub,'Native export test',8)
   const f=await fixtureRuntime(),frame=f.figma.createFrame();f.page.appendChild(frame)
   const task=await taskFor(call,client,id)
   const bytes=Buffer.from([0,0,0,24,102,116,121,112,105,115,111,109,0,0,0,0])
@@ -120,7 +120,7 @@ test('animation export uses native exportAsync and saves encoded output without 
 })
 
 test('animation export propagates native availability errors and rejects still images as video',async t=>{
-  const {hub,open,call}=await setup(t),client=await open(),id=await connect(hub,'Native export test',5)
+  const {hub,open,call}=await setup(t),client=await open(),id=await connect(hub,'Native export test',8)
   const f=await fixtureRuntime(),frame=f.figma.createFrame();f.page.appendChild(frame)
   const task=await taskFor(call,client,id),args={fileKey:task.fileKey,nodeId:frame.id,format:'MP4'}
   frame.exportAsync=async()=>{throw Error('Native MP4 export is unavailable for this account')}
@@ -134,7 +134,7 @@ test('animation export propagates native availability errors and rejects still i
 })
 
 test('interrupted writes create a shared write barrier until an actual full metadata read',async t=>{
-  const {hub,open,call}=await setup(t),client=await open(),id=await connect(hub,'Test',5),task=await taskFor(call,client,id)
+  const {hub,open,call}=await setup(t),client=await open(),id=await connect(hub,'Test',8),task=await taskFor(call,client,id)
   const controller=new AbortController()
   const pending=call(client,'use_figma',{...task,code:'return 1'},controller.signal).catch(e=>e)
   const polled=await request(hub,'/poll',{connectionId:id}),job=await polled.json()
@@ -156,7 +156,7 @@ test('interrupted writes create a shared write barrier until an actual full meta
 
 
 test('metadata-only screenshot responses fail explicitly instead of claiming visual verification',async t=>{
- const {hub,open,call}=await setup(t),client=await open(),id=await connect(hub,'Missing image',5)
+ const {hub,open,call}=await setup(t),client=await open(),id=await connect(hub,'Missing image',8)
  const pending=call(client,'get_screenshot',{nodeId:'1:2'})
  const job=await (await request(hub,'/poll',{connectionId:id})).json()
  await request(hub,'/result',{connectionId:id,id:job.id,ok:true,result:{value:{id:'1:2',name:'Frame'},images:[]}})

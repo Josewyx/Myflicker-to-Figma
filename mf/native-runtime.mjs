@@ -20,7 +20,7 @@ export async function ensureNativeRuntime(root,{home=resolve(process.env.MF_FIGM
  if(await complete(root))return root
  const pkg=JSON.parse(await readFile(join(root,'package.json'),'utf8'))
  const packed=pkg.files?.includes('runtime-payload')
- if(pkg.name!=='myflicker-to-figma'||!/^\d+\.\d+\.\d+$/.test(pkg.version)||!packed&&!pkg.files?.includes('vendor'))throw new Error('请使用完整的 MyFlicker 本地插件发行包；不需要另装 Node 或 npm。')
+ if(pkg.name!=='myflicker-to-figma'||!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(pkg.version)||!packed&&!pkg.files?.includes('vendor'))throw new Error('请使用完整的 MyFlicker 本地插件发行包；不需要另装 Node 或 npm。')
  const lock=await readFile(join(root,'package-lock.json'))
  const bundle=JSON.parse(await readFile(join(root,packed?'runtime-payload/manifest.json':'vendor/.bundle.json'),'utf8'))
  if(bundle.lockHash!==createHash('sha256').update(lock).digest('hex'))throw new Error('插件依赖校验失败，请重新获取完整发行包。')

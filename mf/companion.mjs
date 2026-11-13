@@ -25,7 +25,8 @@ export async function prepareMfCompanion({home,port,token,importParent}){
   const client=await readFile(new URL('companion-client.js',import.meta.url),'utf8')
   const ui=(await readFile(new URL('companion-ui.html',import.meta.url),'utf8')).replace('/*CLIENT*/',()=>client)
   const code=(await readFile(new URL('companion/code.js',ROOT),'utf8')).replace('Math.max(158, Math.min(520','Math.max(64, Math.min(520').replace('height: 210','height: 128')
-  const files={'code.js':`globalThis.DSH_FIGMA_BOOTSTRAP = ${JSON.stringify({version:PACKAGE.version,port,token})};\n`+code,'ui.html':ui,'LICENSE':await readFile(new URL('LICENSE',ROOT),'utf8')}
+  const featherLicense=await readFile(new URL('assets/companion/FEATHER-LICENSE',ROOT),'utf8')
+  const files={'FEATHER-LICENSE':featherLicense,'code.js':`globalThis.DSH_FIGMA_BOOTSTRAP = ${JSON.stringify({version:PACKAGE.version,port,token})};\n`+code,'ui.html':ui,'LICENSE':await readFile(new URL('LICENSE',ROOT),'utf8')}
   files['README.txt']=`Myflicker-to-Figma ${PACKAGE.version}\n本机专用配套插件，包含连接凭证，请勿分享或上传。\n首次导入 manifest.json，然后在目标文件运行 Myflicker-to-Figma。\n保持窗口打开；可以“收起”，关闭会断开。\n连接向导：http://127.0.0.1:${port}/setup\nLocal mode uses no official MCP quota. Native Figma permissions still apply.\n`
   for(const [name,value] of Object.entries(files))if(name!=='manifest.json')await privateText(join(folder,name),value)
   await privateJson(join(folder,'manifest.json'),manifest)

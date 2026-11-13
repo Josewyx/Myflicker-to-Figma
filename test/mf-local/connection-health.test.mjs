@@ -9,7 +9,7 @@ import {bridgeToken} from '../../lib/storage.mjs'
 import {request,connect} from '../fixtures.mjs'
 
 test('version diagnosis distinguishes unknown, mismatched and insufficient feature levels without declaring every mismatch broken',()=>{
- const doc=(companionVersion,featureVersion=5)=>({companionVersion,featureVersion})
+ const doc=(companionVersion,featureVersion=8)=>({companionVersion,featureVersion})
  assert.equal(versionHealth('0.5.4',[]).state,'waiting')
  assert.equal(versionHealth('0.5.4',[doc('0.5.4')]).state,'ready')
  const mismatch=versionHealth('0.5.4',[doc('0.5.2'),doc('0.5.5')]);assert.equal(mismatch.state,'version-mismatch');assert.equal(mismatch.compatible,true)
@@ -29,7 +29,7 @@ test('self-check finds missing files; nonce-protected repair recreates only pair
  const repair=nonce=>fetch(base+'/setup/repair',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({nonce})})
  assert.equal((await repair('bad')).status,403)
  assert.equal((await fetch(base+'/setup/repair',{method:'POST',headers:{origin:'https://evil.example','content-type':'application/json'},body:JSON.stringify({nonce:before.actionNonce})})).status,403)
- const id=await connect(hub,'PRIVATE NAME',5),doc=hub.documents.get(id);doc.companionVersion='0.1.0'
+ const id=await connect(hub,'PRIVATE NAME',8),doc=hub.documents.get(id);doc.companionVersion='0.1.0'
  doc.active={id:'in-flight'};assert.equal((await repair(before.actionNonce)).status,409);doc.active=null
  assert.equal((await status()).health.filesReady,false)
  assert.equal((await repair(before.actionNonce)).status,200)

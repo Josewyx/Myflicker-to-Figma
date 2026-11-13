@@ -72,3 +72,12 @@ test('dependency bundle verifies chunks and rejects traversal before writing fil
  await writeFile(join(payload,'manifest.json'),JSON.stringify({format:'mf-js-dependencies-v1',lockHash,files:1,parts:[{name:'part-0000.data',size:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')}]}))
  await assert.rejects(unpackDependencies(payload,join(root,'output'),lockHash),/Invalid dependency file/)
 })
+
+
+test('internal prerelease snapshots start offline while malformed version paths are rejected',async t=>{
+ const {root,home}=await fixture(t),path=join(root,'package.json'),pkg=JSON.parse(await readFile(path,'utf8'))
+ pkg.version='0.6.0-internal.1';await writeFile(path,JSON.stringify(pkg))
+ const runtime=await ensureNativeRuntime(root,{home});assert.ok(runtime.includes('0.6.0-internal.1'))
+ pkg.version='0.6.0/../../escape';await writeFile(path,JSON.stringify(pkg))
+ await assert.rejects(ensureNativeRuntime(root,{home}),/完整/)
+})

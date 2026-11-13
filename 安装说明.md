@@ -1,6 +1,6 @@
 # Myflicker-to-Figma 使用指南
 
-> 版本 0.5.8｜更新 2026-11-13｜macOS 本地使用
+> 版本 0.6.0｜更新 2026-11-14｜macOS 本地使用
 
 Myflicker-to-Figma 让 MyFlicker 用自然语言读取、创建和编辑 Figma 原生设计。免费 Starter 账号在具有文件编辑权限时也可使用；支持当前账号和编辑器实际开放的原生动效，生成的图层可继续编辑。
 
@@ -14,6 +14,7 @@ Myflicker-to-Figma 让 MyFlicker 用自然语言读取、创建和编辑 Figma �
 | Figma | 当前电脑生成的本机专用配套插件 | 首次从“下载”中的 manifest.json 导入 |
 
 **GitHub 市场不会自动安装 Figma 端。** 本项目尚未上架 Figma Community。每台电脑都需自行配对，不要分享本机专用目录。
+
 
 ## 1. 在 MyFlicker 中安装
 
@@ -75,7 +76,7 @@ Figma 配套插件仍在运行时，直接向 MyFlicker 的本地 Code 会话描
 
 ## 6. 升级与旧入口清理
 
-**0.5.8 修复了多页面创建与全页组件预加载问题。更新 MyFlicker 端后，请关闭并重新运行 Figma 插件，确认向导两端都显示 0.5.8；旧配套协议会拒绝写入并提示更新。当前会话仍使用旧工具时，新建本地 Code 会话。**
+**0.6.0 增加字体解析、精简读取、批量编辑和失败恢复等能力，并保留多页面及按需组件读取修复。更新 MyFlicker 端后，关闭并重新运行 Figma 插件，确认两端都显示 0.6.0、配套协议为 8。旧配套会拒绝新功能写入并提示更新，必要时按向导重新准备并导入。当前会话仍使用旧工具时，新建本地 Code 会话。**
 
 
 **MyFlicker：** 在“管理 Marketplace”点击本市场右侧刷新图标，再回插件列表更新或安装新版。不是运行中的无感热更新；先等当前操作完成，避免新旧版本同时启用。工具未刷新时重启 MyFlicker 并新建会话。
@@ -102,7 +103,7 @@ Figma 配套插件仍在运行时，直接向 MyFlicker 的本地 Code 会话描
 
 ## 备用：ZIP 本地安装
 
-从 [GitHub Releases](https://github.com/Josewyx/Myflicker-to-Figma/releases/latest) 下载 `Myflicker-to-Figma-0.5.8.zip`。解压后，在 MyFlicker **设置 → Plugins → 安装本地 Plugin** 选择整个 **Myflicker-to-Figma-0.5.8** 文件夹；不要选择其中的 .claude-plugin、skills 或 Figma manifest。然后从本指南第 2 步继续。
+从 [GitHub Releases](https://github.com/Josewyx/Myflicker-to-Figma/releases/latest) 下载 `Myflicker-to-Figma-0.6.0.zip`。解压后，在 MyFlicker **设置 → Plugins → 安装本地 Plugin** 选择整个 **Myflicker-to-Figma-0.6.0** 文件夹；不要选择其中的 .claude-plugin、skills 或 Figma manifest。然后从本指南第 2 步继续。
 
 ## 隐私与能力边界
 
